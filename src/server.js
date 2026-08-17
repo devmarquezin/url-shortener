@@ -8,6 +8,8 @@ const PORT = 3000;
 
 const urls = [];
 
+
+//  funcao para gerarmos os shortCodes
 function generateShortCode() {
     const characters =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -23,6 +25,22 @@ function generateShortCode() {
     }
 
     return code;
+}
+
+
+//  funcao para verificar que dois links nunca recebam o mesmo shortCode
+//  gera "abcd1234" -->> existe? -->> sim -->> gera dnv -->> 
+//  "X92pQa" -->> existe? -->> nao -->> retorna "X92pQa".
+function generateUniqueShortCode() {
+    let shortCode;
+
+    do {
+        shortCode = generateShortCode();
+    } while (
+        urls.some((item) => item.shortCode === shortCode)
+    );
+
+    return shortCode;
 }
 
 app.get("/", (req, res) => {
@@ -49,7 +67,7 @@ app.post("/shorten", (req, res) => {
         });
     }
 
-    const shortCode = generateShortCode();
+    const shortCode = generateUniqueShortCode();
 
     const newUrl = {
         id: urls.length + 1,
@@ -57,6 +75,7 @@ app.post("/shorten", (req, res) => {
         shortCode: shortCode,
         clicks: 0,
     }
+
 
     urls.push(newUrl);
 
@@ -95,3 +114,4 @@ app.get("/:shortCode", (req, res) => {
 app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
+
